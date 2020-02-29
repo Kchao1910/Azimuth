@@ -1,0 +1,140 @@
+:root {
+	--medium-red: rgb(215, 34, 41);
+}
+
+* {
+	font-family: termina, sans-serif;
+	font-style: normal;
+	margin: 0;
+	padding: 0;
+}
+
+.body {
+	padding: 24px;
+}
+
+.main-grid {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	grid-template-rows: auto 1fr 1fr 1fr;
+	grid-gap: 25px;
+}
+/* Main Header */
+.brand-name {
+	text-align: center;
+}
+
+.search-button {
+	background: var(--medium-red);
+	border: none;
+	border-radius: 50px;
+	box-shadow: 
+	0px 4px 8px rgba(0, 0, 0, 0.15),
+	0px 8px 16px rgba(0, 0, 0, 0.1),
+	0px 16px 32px rgba(0, 0, 0, 0.05);
+	color: white;
+	grid-column: 5;
+}
+
+.search-button:hover {
+	background: white;
+	color: var(--medium-red);
+	transition: 0.25s ease-in-out;
+}
+
+.summoner-search-input {
+	grid-column: 4;
+	padding-left: 25px;
+}
+
+/* Main Matchlist */
+.champion-icon {
+	height: 4rem;
+	width: 4rem;
+}
+
+.recent-matchlist-container {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	grid-template-rows: repeat(4, 1fr);
+	grid-gap: 25px;
+	grid-column: 2/6;
+	grid-row: 2/4;
+}
+
+.recent-match {
+	border-radius: 12.5px;
+	align-items: center;
+	box-shadow: 
+		0px 8px 16px rgba(0, 0, 0, 0.15),
+		0px 16px 32px rgba(0, 0, 0, 0.1),
+		0px 32px 48px rgba(0, 0, 0, 0.05);
+	display: flex;
+	grid-column: 1/5;
+	justify-content: space-between;
+	padding: 25px;
+	position: relative;
+}
+
+.recent-match::after {
+	content: "";
+	height: 0;
+	width: 0;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	position: absolute;
+	background: transparent;
+	box-shadow: inset 25px 100px white;
+	z-index: 5;
+}
+
+/* Main Summoner Summary */
+.summary-label {
+	animation: 1.1s cubic-bezier(0.58, 0, 0.42, 1) slide-up;
+	font-weight: bold;
+	text-overflow: inherit;
+}
+
+.summoner-icon {
+	background: black;
+	border-radius: 4rem;
+	height: 8rem;
+	width: 8rem;
+}
+
+.summoner-name {
+	color: var(--medium-red);
+}
+
+.summary-stats {
+	margin: 12.5px 0;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.summoner-summary-container {
+	border-radius: 12.5px;
+	box-shadow: 
+		0px 8px 16px rgba(0, 0, 0, 0.15),
+		0px 16px 32px rgba(0, 0, 0, 0.1),
+		0px 32px 48px rgba(0, 0, 0, 0.05);
+	grid-column: 1;
+	grid-row: 2;
+	padding: 25px;
+}
+
+.summary-stats, .summoner-summary-container {
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+}
+
+@keyframes slide-up {
+	0% {
+		transform: translateY(-100%);
+	} 100% {
+		transform: translateY(0%);
+	}
+}
