@@ -1,7 +1,3 @@
-// syntax for api: https://{platform-routing-value}/{api}?api_key={apikey
-// routing value: na1.api.riotgames.com
-// summoner-name: /lol/summoner/v4/summoners/by-name/{summonerName}
-// https://na1.api.riotgames.com/lol/match/v4/matches/3307366212?QvFFoHtxbgAofA1vev7YAmkxgEe2VAbeBCMSmm-WlwwFrKQ&api_key=RGAPI-7888388e-38e5-4bbd-9466-4a087a95d0fe
 const apiKey = "";
 
 const summonerApi = "https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/";
