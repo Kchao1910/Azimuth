@@ -24,7 +24,11 @@
 	text-align: center;
 }
 
-.search-button {
+#region-select {
+	grid-column: 4;
+}
+
+#search-button {
 	background: var(--medium-red);
 	border: none;
 	border-radius: 50px;
@@ -36,19 +40,21 @@
 	grid-column: 5;
 }
 
-.search-button:hover {
+#search-button:hover {
 	background: white;
 	color: var(--medium-red);
 	transition: 0.25s ease-in-out;
 }
 
-.summoner-search-input {
-	grid-column: 4;
+#summoner-search-input {
+	grid-column: 3;
 	padding-left: 25px;
 }
 
 /* Main Matchlist */
 .champion-icon {
+	background: black;
+	border-radius: 2rem;
 	height: 4rem;
 	width: 4rem;
 }
