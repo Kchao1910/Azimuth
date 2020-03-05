@@ -1,10 +1,17 @@
+
 const apiKey = "";
 
-const summonerApi = "https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/";
-const leagueApi = "https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/";
-const matchApi = "https://na1.api.riotgames.com/lol/match/v4/matchlists/by-account/";
-const individualMatchApi = "https://na1.api.riotgames.com/lol/match/v4/matches/";
-let matchStats = document.querySelectorAll(".match-stat");
+
+const summonerApi = "lol/summoner/v4/summoners/by-name/";
+const leagueApi = "lol/league/v4/entries/by-summoner/";
+const matchApi = "lol/match/v4/matchlists/by-account/";
+const individualMatchApi = "lol/match/v4/matches/";
+
+let matchStats = document.querySelectorAll(".match-stat"); // this is to display in match containers
+
+let apiRegion = {
+  region: ""
+};
 
 let summonerData = {
   name: "",
@@ -39,29 +46,40 @@ let matchTimeLine = {
   timeLine: {}
 };
 
-async function getApiAsync(api, apiEnding) 
+async function getApiAsync(api) 
 {
-  let response = await fetch(`${api}${apiEnding}`);
+  let response = await fetch(api);
   let data = await response.json()
   return data;
+}
+
+function getFullApi(apiBeginning, apiEnding) {
+  return apiBeginning + apiEnding;
 }
 
 document.addEventListener('click', event => {
     event.preventDefault();
 
-    if (event.target.matches(".search-button")) {
-      let summonerNameValue = document.querySelector(".summoner-search-input").value;
-      summonerNameValue = summonerNameValue.replace(' ', '%20');
+    if (event.target.matches("#search-button")) {
+      let summonerNameValue = document.querySelector("#summoner-search-input").value;
+      let regionValue = document.querySelector("#region-select").value;
 
+      summonerNameValue = summonerNameValue.replace(' ', '%20'); // replace white space
+      apiRegion.region = regionValue;
+
+      const summonerApiBeginning = `https://${apiRegion.region}.api.riotgames.com/${summonerApi}`;
       const summonerApiEnding = `${summonerNameValue}?api_key=${apiKey}`;
 
-      getApiAsync(summonerApi, summonerApiEnding)
+      let fullSummonerApi = getFullApi(summonerApiBeginning, summonerApiEnding);
+
+      getApiAsync(fullSummonerApi)
         .then(data => {
           summonerData.name = data["name"];
           summonerData.id = data["id"];
           summonerData.accountId = data["accountId"];
 
           getLeague(summonerData.id);
+          getMatchList(summonerData.accountId);
           
         }).catch(error => {
           console.warn("Api fetch unsuccessful", error);
@@ -70,31 +88,31 @@ document.addEventListener('click', event => {
 });
 
 function getLeague(id) {
+  const leagueApiBeginning = `https://${apiRegion.region}.api.riotgames.com/${leagueApi}`;
   const leagueApiEnding = `${id}?api_key=${apiKey}`;
+  const fullLeagueApi = getFullApi(leagueApiBeginning, leagueApiEnding);
 
-  getApiAsync(leagueApi, leagueApiEnding)
+  getApiAsync(fullLeagueApi)
     .then(data => {
-      console.log(data);
       summonerData.tier = data[0]["tier"];
       summonerData.wins = data[0]["wins"];
       summonerData.losses = data[0]["losses"];
       summonerData.rank = data[0]["rank"];
       summonerData.leaguePoints = data[0]["leaguePoints"];
-      getMatchList(summonerData.accountId);
     }).catch(error => {
       console.warn("Api fetch unsuccessful", error);
     }); 
 }
 
 function getMatchList(accountId) {
+  const matchApiBeginning = `https://${apiRegion.region}.api.riotgames.com/${matchApi}`;
   const matchApiEnding = `${accountId}?beginIndex=0&endIndex=4&api_key=${apiKey}`;
+  const fullMatchApi = getFullApi(matchApiBeginning, matchApiEnding);
 
-  getApiAsync(matchApi, matchApiEnding)
+  getApiAsync(fullMatchApi)
     .then(data => {
-      console.log(data);
       summonerMatchData.matchList = data["matches"];
       populateMatchData(summonerMatchData);
-      
     }).catch(error => {
       console.warn("Api fetch unsuccessful", error);
     }); 
@@ -109,16 +127,21 @@ function populateMatchData(summonerMatchData) {
     individualMatchData.lane.push(match.lane);
   }
 
-  getIndiviualMatch(individualMatchData.gameId[0]);
+  for (let id of individualMatchData.gameId) {
+    getIndiviualMatch(id);
+  }
 }
 
 function getIndiviualMatch(gameId) {
+  const individualMatchApiBeginning = `https://${apiRegion.region}.api.riotgames.com/${individualMatchApi}`;
   const individualMatchApiEnding = `${gameId}?api_key=${apiKey}`;
+  const fullIndividualMatchApi = getFullApi(individualMatchApiBeginning, individualMatchApiEnding);
 
-  getApiAsync(individualMatchApi, individualMatchApiEnding)
+  getApiAsync(fullIndividualMatchApi)
     .then(data => {
-      matchTimeLine.timeLine = data;
       syncMatchData(data);
+      getChampion();
+      display();
     }).catch(error => {
       console.warn("Api fetch unsuccessful", error);
     }); 
@@ -128,19 +151,17 @@ function syncMatchData(timeline) {
   for (let participant of timeline.participantIdentities) {
     if (participant.player.summonerName === summonerData.name) {
       individualMatchData.id.push(participant.participantId);
-      syncChampionData(timeline);
-      getChampion();
-      display();
+      syncChampionData(timeline, participant.participantId);
       return;
     }
   }
 }
 
-function syncChampionData(timeline) {
-  individualMatchData.deaths.push(timeline.participants[individualMatchData.id[0] - 1].stats.deaths);
-  individualMatchData.kills.push(timeline.participants[individualMatchData.id[0] - 1].stats.kills);
-  individualMatchData.goldEarned.push(timeline.participants[individualMatchData.id[0] - 1].stats.goldEarned);
-  individualMatchData.win.push(timeline.participants[individualMatchData.id[0] - 1].stats.win);
+function syncChampionData(timeline, participantId) {
+  individualMatchData.deaths.push(timeline.participants[participantId - 1].stats.deaths);
+  individualMatchData.kills.push(timeline.participants[participantId - 1].stats.kills);
+  individualMatchData.goldEarned.push(timeline.participants[participantId - 1].stats.goldEarned);
+  individualMatchData.win.push(timeline.participants[participantId - 1].stats.win);
 }
 
 function getChampion() {
@@ -167,12 +188,18 @@ function display() {
   wl.textContent = `${summonerData.wins}/${summonerData.losses}`;
   lp.textContent = `${summonerData.leaguePoints}`;
 
-  matchStats[0].textContent = individualMatchData.champion[0];
-  matchStats[1].textContent = summonerMatchData.matchList[0].role;
-  matchStats[2].textContent = summonerMatchData.matchList[0].lane;
-  matchStats[3].textContent = individualMatchData.kills[0];
-  matchStats[4].textContent = individualMatchData.deaths[0];
-  matchStats[5].textContent = individualMatchData.goldEarned[0];
+  let i = 0;
+
+  individualMatchData.gameId.forEach( (game, index) => {
+    matchStats[i].textContent = individualMatchData.champion[index];
+    matchStats[i + 1].textContent = summonerMatchData.matchList[index].role;
+    matchStats[i + 2].textContent = summonerMatchData.matchList[index].lane;
+    matchStats[i + 3].textContent = individualMatchData.kills[index];
+    matchStats[i + 4].textContent = individualMatchData.deaths[index];
+    matchStats[i + 5].textContent = individualMatchData.goldEarned[index];
+
+    i += 6;
+  });
 }
 
 let champions = [
