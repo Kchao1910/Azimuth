@@ -1,5 +1,5 @@
 
-const apiKey = "";
+const apiKey = "RGAPI-bef0399c-e383-46cb-8cab-3077c649a6b2";
 
 
 const summonerApi = "lol/summoner/v4/summoners/by-name/";
@@ -14,6 +14,7 @@ let apiRegion = {
 };
 
 let summonerData = {
+  profileIconId: 0,
   name: "",
   id: "",
   accountId: "",
@@ -74,10 +75,12 @@ document.addEventListener('click', event => {
 
       getApiAsync(fullSummonerApi)
         .then(data => {
+          summonerData.profileIconId = data["profileIconId"];
           summonerData.name = data["name"];
           summonerData.id = data["id"];
           summonerData.accountId = data["accountId"];
 
+          getSummonerIcon(summonerData.profileIconId);
           getLeague(summonerData.id);
           getMatchList(summonerData.accountId);
           
@@ -86,6 +89,12 @@ document.addEventListener('click', event => {
         }); 
     }
 });
+
+function getSummonerIcon(profileIconId) {
+  var summonerIconUrl = `http://ddragon.leagueoflegends.com/cdn/10.5.1/img/profileicon/${profileIconId}.png`;
+  var summonerIcon = document.getElementById("summoner-image").src = summonerIconUrl;
+
+}
 
 function getLeague(id) {
   const leagueApiBeginning = `https://${apiRegion.region}.api.riotgames.com/${leagueApi}`;
@@ -165,16 +174,24 @@ function syncChampionData(timeline, participantId) {
 }
 
 function getChampion() {
+  var x = 0;
   for (let id of individualMatchData.championId) {
     for (let champion of champions) {
       if (champion.id === `${id}`) {
         individualMatchData.champion.push(champion.name);
+        getChampionIcon(champion.name, x);
+        x++;
         break;
       }
     }
   }
-
   return;
+}
+
+function getChampionIcon(name, x) {
+  var champNum = `champion-image${x}`
+  var championIconUrl = `http://ddragon.leagueoflegends.com/cdn/10.5.1/img/champion/${name}.png`;
+  var championIcon = document.getElementById(champNum).src = championIconUrl;
 }
 
 function display() {
