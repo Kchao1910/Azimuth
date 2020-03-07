@@ -189,7 +189,7 @@ function getChampion() {
 }
 
 function getChampionIcon(name, x) {
-  var champNum = `champion-image${x}`
+  var champNum = `champion-image${x}`;
   var championIconUrl = `http://ddragon.leagueoflegends.com/cdn/10.5.1/img/champion/${name}.png`;
   var championIcon = document.getElementById(champNum).src = championIconUrl;
 }
