@@ -1,5 +1,5 @@
 
-const apiKey = "RGAPI-bef0399c-e383-46cb-8cab-3077c649a6b2";
+const apiKey = "";
 
 
 const summonerApi = "lol/summoner/v4/summoners/by-name/";
