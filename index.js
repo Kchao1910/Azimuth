@@ -529,7 +529,7 @@ function displayMatchData(gameIndex, summonerMatchStats, summonerTeamStats) {
   baronValues[gameIndex].textContent = summonerTeamStats.barons;
   dragonValues[gameIndex].textContent = summonerTeamStats.dragons;
   heraldValues[gameIndex].textContent = summonerTeamStats.heralds;
-  towerValues[gameIndex].textContent = summonerTeamStats.towers;
+  towerValues[gameIndex].textContent = summonerTeamStats.objectives;
   winValues[gameIndex].textContent = (summonerTeamStats.winLoss !== "Fail" ? "Win" : "Loss");
 }
 
