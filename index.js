@@ -245,8 +245,9 @@ let champions = [
   {id: "143", name: "Zyra"}
 ];
 
-const spellNames = ["SummonerBarrier", "SummonerBoost", "SummonerDot", "SummonerExhaust", "SummonerFlash", "SummonerHaste", "SummonerHeal",
-"", "", "", "SummonerSmite", "", "", "SummonerTeleport"];
+const spellNames = ["SummonerBoost", "", "SummonerExhaust", "SummonerFlash", "", "SummonerHaste", "SummonerHeal", "", "", "", "SummonerSmite", "SummonerTeleport",
+"SummonerMana", "SummonerDot", "", "", "", "", "", "", "SummonerBarrier", "", "", "", "", "", "", "", "", "SummonerPoroRecall", "SummonerPoroThrow", "SummonerSnowball",
+"", "", "", "", "", "", "SummonerSnowURFSnowball_Mark"];
 
 function checkNameFormat(championName) {
   for (let [key, value] of Object.entries(alternativeChampionNames)) {
