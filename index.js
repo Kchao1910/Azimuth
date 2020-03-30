@@ -1,223 +1,98 @@
+// Part 1: Get input and validate/ ensure that values are filled and correct.
+// Form starting point with region and combine with api
+// Send full api as input to function that outputs response
+// Part 2: Get response, if valid proceed, if not valid do not proceed. (Alert).
+// Part 3: Get information and display
+// Part 4: Data Analytics
 
+/* 
+Elements that need to be populated
+
+Summoner profile card
+1) Summoner Name
+2) Summoner Tier
+3) Summoner Wins/Losses
+4) Summoner League Points
+
+Recent Match Card
+1) Spells - requires 6 individual spells
+2) Items - requires 2 individual items
+3) K/D/A - requires combined string of kills, deaths, and assists
+4) CS (Neutral) - requires both total minions and neutral monsters
+5) Total DMG Dealt - 1 number
+6) Total DMG Taken - 1 number
+7) Total DMG Healed - 1 number
+8) Objective DMG Dealt - 1 number
+9) Objective DMG Taken - 1 number
+10) Barons - 1 number
+11) Dragons - 1 number
+12) Heralds - 1 number
+13) Objectives - 1 number
+14) Win/Loss - 1 string
+
+*/
+
+/* 
+Known api sections
+1) Region
+2) Api ending - different values required
+*/
+
+// Reminder: api keys must be updated daily to ensure application works, api key is appended to the end of each api (may be other additional options).
 const apiKey = "";
 
-
+// 4 Main apis required to display all information required
+// Summoner - gets summoner information such as name and id. Id is required input for League Api and Match Timeline Api.
 const summonerApi = "lol/summoner/v4/summoners/by-name/";
+// League - gets tier, rank, wins, losses, and league points.
 const leagueApi = "lol/league/v4/entries/by-summoner/";
+// Matchlist - gets timeline for all matches (up to last 100 matches). Timelines provide match ids required for the individual match api.
 const matchApi = "lol/match/v4/matchlists/by-account/";
+// Individual Match - gets match data such as champion, role, damage, objectives, minions, etc.
 const individualMatchApi = "lol/match/v4/matches/";
 
-let matchStats = document.querySelectorAll(".match-stat"); // this is to display in match containers
+// elements that need to be populated
+const summonerNameValue = document.querySelector(".summoner-name");
+const tierRankValue = document.querySelector(".tier-value");
+const winLossValue = document.querySelector(".win-loss-value");
+const leaguePointsValue = document.querySelector(".league-points-value");
 
-let apiRegion = {
-  region: ""
+// elements that are required for match statistics
+const championValues = document.querySelectorAll(".champion-name");
+const championArt = document.querySelectorAll(".champion-art");
+const spellValues = document.querySelectorAll(".spell-value");
+const itemValues = document.querySelectorAll(".item-value");
+const kdaValues = document.querySelectorAll(".kda-value");
+const csValues = document.querySelectorAll(".cs-value");
+const goldValues = document.querySelectorAll(".gold-value");
+const totalDamageDealtValues = document.querySelectorAll(".total-damage-dealt-value");
+const totalDamageTakenValues = document.querySelectorAll(".total-damage-taken-value");
+const totalDamageHealedValues = document.querySelectorAll(".total-damage-healed-value");
+const totalDamageMitigatedValues = document.querySelectorAll(".total-damage-mitigated-value");
+const objectiveDamageDealtValues = document.querySelectorAll(".objective-damage-dealt-value");
+const baronValues = document.querySelectorAll(".baron-value");
+const dragonValues = document.querySelectorAll(".dragon-value");
+const heraldValues = document.querySelectorAll(".herald-value");
+const towerValues = document.querySelectorAll(".tower-value");
+const winValues = document.querySelectorAll(".win-status-value");
+
+// 14 champions display incorrectly due to spacing and apostrophes not included in the api
+let alternativeChampionNames = {
+  AurelionSol: "Aurelion Sol",
+  DrMundo: "Dr. Mundo",
+  JarvanIV: "Jarvan IV",
+  Kaisa: "Kai'Sa",
+  Khazix: "Kha'Zix",
+  KogMaw: "Kog'Maw",
+  LeeSin: "Lee Sin",
+  MasterYi: "Master Yi",
+  MissFortune: "Miss Fortune",
+  MonkeyKing: "Monkey King",
+  RekSai: "Rek'Sai",
+  TahmKench: "Tahm'Kench",
+  Velkoz: "Vel'Koz",
+  XinZhao: "Xin Zhao",
 };
-
-let summonerData = {
-  profileIconId: 0,
-  name: "",
-  id: "",
-  accountId: "",
-  tier: "",
-  wins: 0,
-  losses: 0,
-  rank: "",
-  leaguePoints: 0,
-};
-
-let summonerMatchData = {
-  matchList: [],
-  totalGames: 0,
-};
-
-let individualMatchData = {
-  gameId: [],
-  championId: [],
-  champion: [],
-  role: [],
-  lane: [],
-  id: [],
-  deaths: [],
-  kills: [],
-  win: [],
-  goldEarned: []
-};
-
-let matchTimeLine = {
-  timeLine: {}
-};
-
-async function getApiAsync(api) 
-{
-  let response = await fetch(api);
-  let data = await response.json()
-  return data;
-}
-
-function getFullApi(apiBeginning, apiEnding) {
-  return apiBeginning + apiEnding;
-}
-
-document.addEventListener('click', event => {
-    event.preventDefault();
-
-    if (event.target.matches("#search-button")) {
-      let summonerNameValue = document.querySelector("#summoner-search-input").value;
-      let regionValue = document.querySelector("#region-select").value;
-
-      summonerNameValue = summonerNameValue.replace(' ', '%20'); // replace white space
-      apiRegion.region = regionValue;
-
-      const summonerApiBeginning = `https://${apiRegion.region}.api.riotgames.com/${summonerApi}`;
-      const summonerApiEnding = `${summonerNameValue}?api_key=${apiKey}`;
-
-      let fullSummonerApi = getFullApi(summonerApiBeginning, summonerApiEnding);
-
-      getApiAsync(fullSummonerApi)
-        .then(data => {
-          summonerData.profileIconId = data["profileIconId"];
-          summonerData.name = data["name"];
-          summonerData.id = data["id"];
-          summonerData.accountId = data["accountId"];
-
-          getSummonerIcon(summonerData.profileIconId);
-          getLeague(summonerData.id);
-          getMatchList(summonerData.accountId);
-          
-        }).catch(error => {
-          console.warn("Api fetch unsuccessful", error);
-        }); 
-    }
-});
-
-function getSummonerIcon(profileIconId) {
-  var summonerIconUrl = `http://ddragon.leagueoflegends.com/cdn/10.5.1/img/profileicon/${profileIconId}.png`;
-  var summonerIcon = document.getElementById("summoner-image").src = summonerIconUrl;
-
-}
-
-function getLeague(id) {
-  const leagueApiBeginning = `https://${apiRegion.region}.api.riotgames.com/${leagueApi}`;
-  const leagueApiEnding = `${id}?api_key=${apiKey}`;
-  const fullLeagueApi = getFullApi(leagueApiBeginning, leagueApiEnding);
-
-  getApiAsync(fullLeagueApi)
-    .then(data => {
-      summonerData.tier = data[0]["tier"];
-      summonerData.wins = data[0]["wins"];
-      summonerData.losses = data[0]["losses"];
-      summonerData.rank = data[0]["rank"];
-      summonerData.leaguePoints = data[0]["leaguePoints"];
-    }).catch(error => {
-      console.warn("Api fetch unsuccessful", error);
-    }); 
-}
-
-function getMatchList(accountId) {
-  const matchApiBeginning = `https://${apiRegion.region}.api.riotgames.com/${matchApi}`;
-  const matchApiEnding = `${accountId}?beginIndex=0&endIndex=4&api_key=${apiKey}`;
-  const fullMatchApi = getFullApi(matchApiBeginning, matchApiEnding);
-
-  getApiAsync(fullMatchApi)
-    .then(data => {
-      summonerMatchData.matchList = data["matches"];
-      populateMatchData(summonerMatchData);
-    }).catch(error => {
-      console.warn("Api fetch unsuccessful", error);
-    }); 
-}
-
-function populateMatchData(summonerMatchData) {
-
-  for (let match of summonerMatchData.matchList) {
-    individualMatchData.gameId.push(match.gameId);
-    individualMatchData.championId.push(match.champion);
-    individualMatchData.role.push(match.role);
-    individualMatchData.lane.push(match.lane);
-  }
-
-  for (let id of individualMatchData.gameId) {
-    getIndiviualMatch(id);
-  }
-}
-
-function getIndiviualMatch(gameId) {
-  const individualMatchApiBeginning = `https://${apiRegion.region}.api.riotgames.com/${individualMatchApi}`;
-  const individualMatchApiEnding = `${gameId}?api_key=${apiKey}`;
-  const fullIndividualMatchApi = getFullApi(individualMatchApiBeginning, individualMatchApiEnding);
-
-  getApiAsync(fullIndividualMatchApi)
-    .then(data => {
-      syncMatchData(data);
-      getChampion();
-      display();
-    }).catch(error => {
-      console.warn("Api fetch unsuccessful", error);
-    }); 
-}
-
-function syncMatchData(timeline) {
-  for (let participant of timeline.participantIdentities) {
-    if (participant.player.summonerName === summonerData.name) {
-      individualMatchData.id.push(participant.participantId);
-      syncChampionData(timeline, participant.participantId);
-      return;
-    }
-  }
-}
-
-function syncChampionData(timeline, participantId) {
-  individualMatchData.deaths.push(timeline.participants[participantId - 1].stats.deaths);
-  individualMatchData.kills.push(timeline.participants[participantId - 1].stats.kills);
-  individualMatchData.goldEarned.push(timeline.participants[participantId - 1].stats.goldEarned);
-  individualMatchData.win.push(timeline.participants[participantId - 1].stats.win);
-}
-
-function getChampion() {
-  var x = 0;
-  for (let id of individualMatchData.championId) {
-    for (let champion of champions) {
-      if (champion.id === `${id}`) {
-        individualMatchData.champion.push(champion.name);
-        getChampionIcon(champion.name, x);
-        x++;
-        break;
-      }
-    }
-  }
-  return;
-}
-
-function getChampionIcon(name, x) {
-  var champNum = `champion-image${x}`;
-  var championIconUrl = `http://ddragon.leagueoflegends.com/cdn/10.5.1/img/champion/${name}.png`;
-  var championIcon = document.getElementById(champNum).src = championIconUrl;
-}
-
-function display() {
-  const summonerName = document.querySelector(".summoner-name");
-  const tier = document.querySelector(".tier");
-  const wl = document.querySelector(".wl");
-  const lp = document.querySelector(".lp");
-
-  summonerName.textContent = `${summonerData.name}`;
-  tier.textContent = `${summonerData.tier} ${summonerData.rank}`;
-  wl.textContent = `${summonerData.wins}/${summonerData.losses}`;
-  lp.textContent = `${summonerData.leaguePoints}`;
-
-  let i = 0;
-
-  individualMatchData.gameId.forEach( (game, index) => {
-    matchStats[i].textContent = individualMatchData.champion[index];
-    matchStats[i + 1].textContent = summonerMatchData.matchList[index].role;
-    matchStats[i + 2].textContent = summonerMatchData.matchList[index].lane;
-    matchStats[i + 3].textContent = individualMatchData.kills[index];
-    matchStats[i + 4].textContent = individualMatchData.deaths[index];
-    matchStats[i + 5].textContent = individualMatchData.goldEarned[index];
-
-    i += 6;
-  });
-}
 
 let champions = [
   {id: "266", name: "Aatrox"}, 
@@ -229,7 +104,7 @@ let champions = [
   {id: "1", name: "Annie"}, 
   {id: "523", name: "Aphelios"}, 
   {id: "22", name: "Ashe"}, 
-  {id: "136", name: "AurelionSol"}, 
+  {id: "136", name: "AurelionSol"}, //needs to have a space
   {id: "268", name: "Azir"}, 
   {id: "432", name: "Bard"}, 
   {id: "53", name: "Blitzcrank"}, 
@@ -243,7 +118,7 @@ let champions = [
   {id: "122", name: "Darius"}, 
   {id: "131", name: "Diana"}, 
   {id: "119", name: "Draven"}, 
-  {id: "36", name: "DrMundo"}, 
+  {id: "36", name: "DrMundo"}, // Needs to have a period
   {id: "245", name: "Ekko"}, 
   {id: "60", name: "Elise"}, 
   {id: "28", name: "Evelynn"}, 
@@ -263,12 +138,12 @@ let champions = [
   {id: "39", name: "Irelia"}, 
   {id: "427", name: "Ivern"}, 
   {id: "40", name: "Janna"}, 
-  {id: "59", name: "JarvanIV"}, 
+  {id: "59", name: "JarvanIV"}, // Needs to have a space
   {id: "24", name: "Jax"}, 
   {id: "126", name: "Jayce"}, 
   {id: "202", name: "Jhin"}, 
   {id: "222", name: "Jinx"}, 
-  {id: "145", name: "Kaisa"}, 
+  {id: "145", name: "Kaisa"}, // Needs to have an apostrophe
   {id: "429", name: "Kalista"}, 
   {id: "43", name: "Karma"}, 
   {id: "30", name: "Karthus"}, 
@@ -277,12 +152,12 @@ let champions = [
   {id: "10", name: "Kayle"}, 
   {id: "141", name: "Kayn"}, 
   {id: "85", name: "Kennen"}, 
-  {id: "121", name: "Khazix"}, 
+  {id: "121", name: "Khazix"}, // Needs to have an apostrophe
   {id: "203", name: "Kindred"}, 
   {id: "240", name: "Kled"}, 
-  {id: "96", name: "KogMaw"}, 
+  {id: "96", name: "KogMaw"}, // Needs to have an apostrophe
   {id: "7", name: "Leblanc"}, 
-  {id: "64", name: "LeeSin"}, 
+  {id: "64", name: "LeeSin"}, // Needs to have a space
   {id: "89", name: "Leona"}, 
   {id: "127", name: "Lissandra"}, 
   {id: "236", name: "Lucian"}, 
@@ -291,9 +166,9 @@ let champions = [
   {id: "54", name: "Malphite"}, 
   {id: "90", name: "Malzahar"}, 
   {id: "57", name: "Maokai"}, 
-  {id: "11", name: "MasterYi"}, 
-  {id: "21", name: "MissFortune"}, 
-  {id: "62", name: "MonkeyKing"}, 
+  {id: "11", name: "MasterYi"}, // Needs to have a space
+  {id: "21", name: "MissFortune"}, // Needs to have a space
+  {id: "62", name: "MonkeyKing"}, // Needs to have a space
   {id: "82", name: "Mordekaiser"}, 
   {id: "25", name: "Morgana"}, 
   {id: "267", name: "Nami"}, 
@@ -313,7 +188,7 @@ let champions = [
   {id: "133", name: "Quinn"}, 
   {id: "497", name: "Rakan"}, 
   {id: "33", name: "Rammus"}, 
-  {id: "421", name: "RekSai"}, 
+  {id: "421", name: "RekSai"}, // Needs to have an apostrophe
   {id: "58", name: "Renekton"}, 
   {id: "107", name: "Rengar"}, 
   {id: "92", name: "Riven"}, 
@@ -334,7 +209,7 @@ let champions = [
   {id: "50", name: "Swain"}, 
   {id: "517", name: "Sylas"}, 
   {id: "134", name: "Syndra"}, 
-  {id: "223", name: "TahmKench"}, 
+  {id: "223", name: "TahmKench"}, // Needs to have a space
   {id: "163", name: "Taliyah"}, 
   {id: "91", name: "Talon"}, 
   {id: "44", name: "Taric"}, 
@@ -350,7 +225,7 @@ let champions = [
   {id: "110", name: "Varus"}, 
   {id: "67", name: "Vayne"}, 
   {id: "45", name: "Veigar"}, 
-  {id: "161", name: "Velkoz"}, 
+  {id: "161", name: "Velkoz"}, // Needs to have an apostrophe
   {id: "254", name: "Vi"}, 
   {id: "112", name: "Viktor"}, 
   {id: "8", name: "Vladimir"}, 
@@ -358,7 +233,7 @@ let champions = [
   {id: "19", name: "Warwick"}, 
   {id: "498", name: "Xayah"}, 
   {id: "101", name: "Xerath"}, 
-  {id: "5", name: "XinZhao"}, 
+  {id: "5", name: "XinZhao"}, // Needs to have a space
   {id: "157", name: "Yasuo"}, 
   {id: "83", name: "Yorick"}, 
   {id: "350", name: "Yuumi"}, 
@@ -369,3 +244,353 @@ let champions = [
   {id: "142", name: "Zoe"}, 
   {id: "143", name: "Zyra"}
 ];
+
+const spellNames = ["SummonerBarrier", "SummonerBoost", "SummonerDot", "SummonerExhaust", "SummonerFlash", "SummonerHaste", "SummonerHeal",
+"", "", "", "SummonerSmite", "", "", "SummonerTeleport"];
+
+function checkNameFormat(championName) {
+  for (let [key, value] of Object.entries(alternativeChampionNames)) {
+    if (`${key}` === championName) {
+      championName = `${value}`;
+      break;
+    }
+  }
+
+  return championName;
+}
+
+let basicApiData = {
+  name: "",
+  region: "",
+  urlName: ""
+};
+
+function summonerBasicData(accountId, id, name) {
+  this.accountId = accountId;
+  this.id = id;
+  this.name = name;
+}
+
+function summonerLeagueData(leaguePoints, losses, rank, tier, summonerName, wins) {
+  this.leaguePoints = leaguePoints;
+  this.losses = losses;
+  this.rank = rank;
+  this.tier = tier;
+  this.summonerName = summonerName;
+  this.wins = wins;
+}
+
+function summonerMatchList(matchList) {
+  this.matchList = matchList;
+}
+
+function summonerIndividualMatchData(championId, spells, items, kills, deaths, assists, gold, totalMinions, neutralMinions, 
+totalDamageDealt, totalDamageTaken, damageHealed, damageMitigated, damageToObjectives) {
+  this.championId = championId;
+  this.spells = spells;
+  this.items = items;
+  //this.kills = kills;
+  //this.deaths = deaths;
+  //this.assists = assists;
+  this.kda = `${kills}/${deaths}/${assists}`;
+  this.gold = gold;
+  this.totalMinions = totalMinions;
+  this.neutralMinions = neutralMinions;
+  this.totalDamageDealt = totalDamageDealt;
+  this.totalDamageTaken = totalDamageTaken;
+  this.damageHealed = damageHealed;
+  this.damageMitigated = damageMitigated;
+  this.damageToObjectives = damageToObjectives;
+}
+
+function summonerTeamData(teamId, barons, dragons, heralds, objectives, winLoss) {
+  this.teamId = teamId;
+  this.barons = barons;
+  this.dragons = dragons;
+  this.heralds = heralds;
+  this.objectives = objectives;
+  this.winLoss = winLoss;
+}
+
+function getMatchIds(matchListStats) {
+  let matchIdList = [];
+
+  for (let match in matchListStats) {
+    matchIdList.push(matchListStats[match].gameId);
+  }
+
+  return matchIdList;
+}
+
+// Part 1: Get input values: summonerName and summonerRegion
+function getUserInput() {
+  const summonerName = document.querySelector(".summoner-name-input").value;
+  const summonerRegion = document.querySelector(".summoner-region-select").value;
+  
+  return validateUserInput(summonerName, summonerRegion);
+}
+
+// Part 1.1: Validate Input
+function validateUserInput(summonerName, summonerRegion) {
+  // Step 1: make sure form is completely filled
+  // Step 2: make sure that string is trimmed
+  let inputIsFilled = false;
+  let regionIsSelected = false;
+
+  if (summonerName !== "") {
+    inputIsFilled = true;
+  }
+
+  if (summonerRegion !== "region") {
+    regionIsSelected = true;
+  }
+
+  if ((inputIsFilled === false) && (regionIsSelected === false)) {
+    return "Summoner name is blank and region has not been selected.";
+  }
+
+  if ((inputIsFilled === true) && (regionIsSelected === false)) {
+    return "Region is not specified.";
+  }
+
+  if ((inputIsFilled === false) && (regionIsSelected === true)) {
+    return "Summoner name is blank.";
+  }
+
+  if ((inputIsFilled === true) && (regionIsSelected === true)) {
+    // URLify spaces
+    summonerName = summonerName.trim(); // trim spaces before and after string
+    basicApiData.name = summonerName;
+    summonerName = summonerName.replace(" ", "%20"); // URLify white space
+    basicApiData.urlName = summonerName;
+    basicApiData.region = summonerRegion;
+    
+    return true;
+  }
+}
+
+async function asyncApiFetch(apiUrl) {
+  let response = await fetch(apiUrl);
+  let data = await response.json();
+  return data;
+}
+
+function formApiRoute(summonerRegion, api) {
+ return `https://${summonerRegion}.api.riotgames.com/${api}`;
+}
+
+function formApiUrl(apiRoute, apiEnding) {
+  return apiRoute + apiEnding;
+}
+
+function getLeagueData(id) {
+  let apiRoute = formApiRoute(basicApiData.region, leagueApi);
+  let apiEnding = `${id}?api_key=${apiKey}`;
+  let apiUrl = formApiUrl(apiRoute, apiEnding);
+
+  asyncApiFetch(apiUrl)
+  .then(data => {
+    let leaguePoints = data[0]["leaguePoints"];
+    let losses = data[0]["losses"];
+    let rank = data[0]["rank"];
+    let tier = data[0]["tier"];
+    let summonerName = data[0]["summonerName"];
+    let wins = data[0]["wins"];
+    const leagueStats = new summonerLeagueData(leaguePoints, losses, rank, tier, summonerName, wins);
+    displayBasicSummonerData(leagueStats);
+  }).catch(error => {
+    console.warn(error);
+  });
+}
+
+function getMatchList(accountId) {
+  let apiRoute = formApiRoute(basicApiData.region, matchApi);
+  let apiEnding = `${accountId}?beginIndex=0&endIndex=3&api_key=${apiKey}`;
+  let apiUrl = formApiUrl(apiRoute, apiEnding);
+
+  asyncApiFetch(apiUrl)
+  .then(data => {
+    let matchList = data["matches"];
+    const matchListStats = new summonerMatchList(matchList);
+    const matchIdStats = getMatchIds(matchListStats.matchList);
+    let gameIndex = 0;
+
+    for (let match of matchIdStats) {
+      getIndividualMatch(gameIndex, match);
+      gameIndex += 1;
+    }
+
+  }).catch(error => {
+    console.warn(error);
+  });
+}
+
+// Get id that acts as dependency for stats related to summoner
+function getParticipantId(gameIndex, timeline) {
+  for (let participant of timeline.participantIdentities) {
+    if (participant.player.summonerName.toLowerCase() === basicApiData.name.toLowerCase()) {
+      getParticipantStats(gameIndex, timeline, (participant.participantId - 1));
+      return;
+    }
+  }
+}
+
+// This is where we get all the stats from
+function getParticipantStats(gameIndex, timeline, participantId) {
+  const participant = timeline.participants[participantId];
+  const stats = participant.stats;
+  let championId = participant.championId;
+  let teamId = ((participant.teamId / 100) - 1);
+  let spells = [participant.spell1Id, participant.spell2Id];
+  let items = [stats.item0, stats.item1, stats.item2, stats.item3, stats.item4, stats.item5]; // does not include trinkets (wards/ traps)
+  let kills = stats.kills;
+  let deaths = stats.deaths;
+  let assists = stats.assists;
+  let totalMinions = stats.totalMinionsKilled;
+  let neutralMinions = stats.neutralMinionsKilled;
+  let gold = stats.goldEarned;
+  let totalDamageDealt = stats.totalDamageDealt;
+  let totalDamageTaken = stats.totalDamageTaken;
+  let totalDamageHealed = stats.totalHeal;
+  let totalDamageMitigated = stats.damageSelfMitigated;
+  let objectiveDamageDealt = stats.damageDealtToObjectives;
+
+  let teams = timeline.teams[teamId];
+  let barons = teams.baronKills;
+  let dragons = teams.dragonKills;
+  let heralds = teams.riftHeraldKills;
+  let towers = teams.towerKills;
+  let win = teams.win;
+
+  let summonerMatchStats = new summonerIndividualMatchData(championId, spells, items, kills, deaths, assists, gold, totalMinions, neutralMinions,
+  totalDamageDealt, totalDamageTaken, totalDamageHealed, totalDamageMitigated, objectiveDamageDealt);
+
+  let summonerTeamStats = new summonerTeamData(teamId, barons, dragons, heralds, towers, win);
+  
+  displayMatchData(gameIndex, summonerMatchStats, summonerTeamStats);
+
+ 
+  return;
+}
+
+// Container for getting individual match statistics
+function getIndividualMatch(gameIndex, match) {
+  let apiRoute = formApiRoute(basicApiData.region, individualMatchApi);
+  let apiEnding = `${match}?api_key=${apiKey}`;
+  let apiUrl = formApiUrl(apiRoute, apiEnding);
+
+  asyncApiFetch(apiUrl)
+    .then(data => {
+      getParticipantId(gameIndex, data);
+    }).catch(error => {
+      console.warn("Api fetch unsuccessful", error);
+    }); 
+}
+
+// Displays the infomation required to form the basic summary
+function displayBasicSummonerData(summonerProfileData) {
+  summonerNameValue.textContent = summonerProfileData.summonerName;
+  tierRankValue.textContent = `${summonerProfileData.tier} ${summonerProfileData.rank} (Ranked Solo)`;
+  winLossValue.textContent = `${summonerProfileData.wins}/${summonerProfileData.losses}`;
+  leaguePointsValue.textContent = summonerProfileData.leaguePoints;
+}
+
+// Displaying individual match's statistics
+function displayMatchData(gameIndex, summonerMatchStats, summonerTeamStats) {
+  let championName = summonerMatchStats.championId;
+  championName = getChampion(championName);
+  championName = checkNameFormat(championName);
+  championValues[gameIndex].textContent = championName;
+  championArt[gameIndex].src = `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${championName}_0.jpg`;
+
+  // display spell images
+  spellValues[(2 * gameIndex)].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/spell/${spellNames[summonerMatchStats.spells[0] - 1]}.png`;
+  spellValues[(2 * gameIndex) + 1].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/spell/${spellNames[summonerMatchStats.spells[1] - 1]}.png`;
+
+  // display item images
+  itemValues[(6 * gameIndex)].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/${summonerMatchStats.items[0]}.png`;
+  itemValues[(6 * gameIndex) + 1].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/${summonerMatchStats.items[1]}.png`;
+  itemValues[(6 * gameIndex) + 2].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/${summonerMatchStats.items[2]}.png`;
+  itemValues[(6 * gameIndex) + 3].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/${summonerMatchStats.items[3]}.png`;
+  itemValues[(6 * gameIndex) + 4].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/${summonerMatchStats.items[4]}.png`;
+  itemValues[(6 * gameIndex) + 5].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/${summonerMatchStats.items[5]}.png`;
+
+  // display individual stats
+  kdaValues[gameIndex].textContent = `${summonerMatchStats.kda}`;
+  csValues[gameIndex].textContent = `${summonerMatchStats.totalMinions} (${summonerMatchStats.neutralMinions})`;
+  goldValues[gameIndex].textContent = summonerMatchStats.gold;
+  totalDamageDealtValues[gameIndex].textContent = summonerMatchStats.totalDamageDealt;
+  totalDamageTakenValues[gameIndex].textContent = summonerMatchStats.totalDamageTaken;
+  totalDamageHealedValues[gameIndex].textContent = summonerMatchStats.damageHealed;
+  totalDamageMitigatedValues[gameIndex].textContent = summonerMatchStats.damageMitigated;
+  objectiveDamageDealtValues[gameIndex].textContent = summonerMatchStats.damageToObjectives;
+
+  // display team stats
+  baronValues[gameIndex].textContent = summonerTeamStats.barons;
+  dragonValues[gameIndex].textContent = summonerTeamStats.dragons;
+  heraldValues[gameIndex].textContent = summonerTeamStats.heralds;
+  towerValues[gameIndex].textContent = summonerTeamStats.towers;
+  winValues[gameIndex].textContent = (summonerTeamStats.winLoss !== "Fail" ? "Win" : "Loss");
+}
+
+function getChampion(championId) {
+  for (let champion of champions) {
+    if (champion.id === `${championId}`) {
+      return champion.name;
+    }
+  }
+
+  return;
+}
+
+// Event delegation
+document.addEventListener("click", event => {
+  if (event.target.matches(".summoner-search-button")) {
+    let message = getUserInput();
+
+    if (message !== true) {
+      alert(message);
+    } else {
+      // first get summoner api
+      let apiRoute = formApiRoute(basicApiData.region, summonerApi);
+      let apiEnding = `${basicApiData.urlName}?api_key=${apiKey}`;
+      let apiUrl = formApiUrl(apiRoute, apiEnding);
+
+      asyncApiFetch(apiUrl)
+        .then(data => {
+          let accountId = data["accountId"];
+          let id = data["id"];
+          let name = data["name"];
+          const basicStats = new summonerBasicData(accountId, id, name);
+
+          getLeagueData(basicStats.id);
+          getMatchList(basicStats.accountId);
+
+        }).catch(error => {
+          console.warn(error);
+        });
+    }
+  }
+});
+
+
+
+/*
+Objects
+Basic Summoner Data
+1) summoner name
+2) tier and rank
+3) wins and losses
+4) league points
+
+Match Data
+Endpoints
+1) Match Timeline
+2) Match
+
+Match Stats
+1) Participant Id
+2) Champion Name
+3) 
+
+*/

@@ -1,162 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://use.typekit.net/rqh6lpp.css">
-    <link rel="stylesheet" href="index.css">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- <link rel="stylesheet" href="https://use.typekit.net/uhw6tlp.css"> -->
+  <link rel="stylesheet" href="https://use.typekit.net/rqh6lpp.css">
+  <link rel="stylesheet" href="index.css">
+  <title>Document</title>
 </head>
-<body class="body">
-  <div class="main-grid">
-		<h1 class="brand-name">AZIMUTH</h1>
-		<input type="text" id="summoner-search-input" placeholder="Beware of Shrooms" autofocus>
-		<select name="" id="region-select">
-			<option >REGION</option>
-			<option value="br1">BR1</option>
-			<option value="eun1">EUN1</option>
-			<option value="euw1">EUW1</option>
-			<option value="jp1">JP1</option>
-			<option value="kr">KR</option>
-			<option value="la1">LA1</option>
-			<option value="la2">LA2</option>
-			<option value="na1">NA1</option>
-			<option value="oc1">OC1</option>
-			<option value="tr1">TR1</option>
-			<option value="ru">RU</option>	
-		</select>
-		<button id="search-button">Search</button>
+<body>
+  <main class="main-grid">
+    <h1 class="brand-name">AZIMUTH</h1>
+    
+    <section class="title-spotlight">
+      <div class="title-container">
+        <p class="title-type">GAMING</p>
+      </div>
+      <div class="title-container">
+        <h1 class="title-name">LEAGUE <h1 class="title-sub">OF</h1></h1>
+      </div>
+      <div class="title-container">
+        <h1 class="title-name">LEGENDS</h1>
+      </div>
+      <div class="title-container">
+        <p class="title-description">
+          By using Riot's API for League of Legends we can provide players indepth data on their matches.
+          Players can analyze their strengths and weaknesses to adopt new playstyles and rise to new ranks.
+        </p>
+      </div>
+    </section>
 
-		<section class="summoner-summary-container">
-			<img id="summoner-image" src="" alt="" class="summoner-icon summary-stats">
-			<h2 class="summoner-name summary-stats">N/A</h2>
+    <button class="navigation-button"> 
+      <a class="navigation-link" href="summoner.html">ENTER THE RIFT</a>
+    </button>
 
-			<section class="summary-stats">
-				<label for="" class="summary-label">TIER</label>
-				<p class="basic-stat tier">N/A</p>
-			</section>
-			<section class="summary-stats">
-				<label for="" class="summary-label">WINS/LOSSES</label>
-				<p class="basic-stat wl">N/A</p>
-			</section>
-			<section class="summary-stats">
-				<label for="" class="summary-label">LEAGUE POINTS</label>
-				<p class="basic-stat lp">N/A</p>
-			</section>
-		</section>
+    <video src="league-esports.webm" class="title-video" type="video/webm" autoplay loop></video>
+    <!-- If we have additional information to add...
+    <p class="scroll-message">SCROLL DOWN</p> -->
+  </main>
 
-		<section class="recent-matchlist-container">
-			<div class="recent-match">
-				<img id="champion-image0" src="" alt="" class="champion-icon">
-				<section class="summary-stats">
-					<label for="" class="summary-label">CHAMPION</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">ROLE</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">LANE</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">KILLS</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">DEATHS</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">GOLD</label>
-					<p class="match-stat">N/A</p>
-				</section>
-			</div>
+  <!-- If we want to make it an SPA...
+  <div class="main-grid about-page">
+    <section class="about-information">
+      <h1>INSTRUCTIONS</h1>
+      <section class="instruction-sequence">
+        <h1 class="instruction-numbers">1</h1>
+        <h1 class="instruction-text">ENTER IN A SUMMONER</h1>
+        <input type="text">
+      </section>
 
-			<div class="recent-match">
-				<img id="champion-image1" src="" alt="" class="champion-icon">
-				<section class="summary-stats">
-					<label for="" class="summary-label">CHAMPION</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">ROLE</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">LANE</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">KILLS</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">DEATHS</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">GOLD</label>
-					<p class="match-stat">N/A</p>
-				</section>
-			</div>
-			<div class="recent-match">
-				<img id="champion-image2" src="" alt="" class="champion-icon">
-				<section class="summary-stats">
-					<label for="" class="summary-label">CHAMPION</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">ROLE</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">LANE</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">KILLS</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">DEATHS</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">GOLD</label>
-					<p class="match-stat">N/A</p>
-				</section>
-			</div>
-			<div class="recent-match">
-				<img id="champion-image3" src="" alt="" class="champion-icon">
-				<section class="summary-stats">
-					<label for="" class="summary-label">CHAMPION</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">ROLE</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">LANE</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">KILLS</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">DEATHS</label>
-					<p class="match-stat">N/A</p>
-				</section>
-				<section class="summary-stats">
-					<label for="" class="summary-label">GOLD</label>
-					<p class="match-stat">N/A</p>
-				</section>
-			</div>
-		</section>
-	</div>
-	<script src="index.js"></script>
+      <section class="instruction-sequence">
+        <h1 class="instruction-numbers">2</h1>
+        <h1 class="instruction-text">CHOOSE A REGION</h1>
+        <select name="" id="">
+          <option value="na1">NA1</option>
+        </select>
+      </section>
+
+      <section class="instruction-sequence">
+        <h1 class="instruction-numbers">3</h1>
+        <h1 class="instruction-text">ENTER THE RIFT</h1>
+      </section>
+    </section>
+  </div> -->
+  
 </body>
 </html>
