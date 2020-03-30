@@ -1,3 +1,29 @@
+/* 
+When it works
+1) 6 requests involving the key per summoner
+
+Issues to be fixed 
+1) When summoner name is not syntaxically the same (ex. Hide on Bush vs HiDE oN BuSH) the application will run into a problem
+where we get a "paused on exception". This happens when we need to get the data to populate the profile card.
+2) 403 error due to missing item (in other words, not a full set of 6 items)
+
+Issue Observations
+1) Looking at the network we can see that error may be due to rate limits of are api key, 
+
+Observation Steps
+1) Rate limit comes in when we look up another summoner right immediately after the current one
+2) Happens roughly at the 8th request 
+3) Looking at Riot documentation, rate limits are imposed not only on requests that depend on the api key
+
+Pending functionalities
+1) Data analytics
+2) Hiding api key (if we want to host it)
+3) Dynamic generation of all matches (up to 100)
+4) Smoother transition from home page to summoner page
+5) Get production key from Riot
+
+
+*/
 // Part 1: Get input and validate/ ensure that values are filled and correct.
 // Form starting point with region and combine with api
 // Send full api as input to function that outputs response
@@ -325,7 +351,7 @@ function getMatchIds(matchListStats) {
 
 // Part 1: Get input values: summonerName and summonerRegion
 function getUserInput() {
-  const summonerName = document.querySelector(".summoner-name-input").value;
+  const summonerName = document.querySelector(".summoner-name-input").value.toLowerCase();
   const summonerRegion = document.querySelector(".summoner-region-select").value;
   
   return validateUserInput(summonerName, summonerRegion);
@@ -362,9 +388,10 @@ function validateUserInput(summonerName, summonerRegion) {
     // URLify spaces
     summonerName = summonerName.trim(); // trim spaces before and after string
     basicApiData.name = summonerName;
-    summonerName = summonerName.replace(" ", "%20"); // URLify white space
+    //summonerName = summonerName.replace(" ", "%20"); // URLify white space, may not be required
     basicApiData.urlName = summonerName;
     basicApiData.region = summonerRegion;
+    console.log(summonerName);
     
     return true;
   }
@@ -443,6 +470,7 @@ function getParticipantStats(gameIndex, timeline, participantId) {
   let championId = participant.championId;
   let teamId = ((participant.teamId / 100) - 1);
   let spells = [participant.spell1Id, participant.spell2Id];
+  console.log(spells);
   let items = [stats.item0, stats.item1, stats.item2, stats.item3, stats.item4, stats.item5]; // does not include trinkets (wards/ traps)
   let kills = stats.kills;
   let deaths = stats.deaths;
@@ -496,25 +524,42 @@ function displayBasicSummonerData(summonerProfileData) {
   leaguePointsValue.textContent = summonerProfileData.leaguePoints;
 }
 
+// check if spell or item exists
+function checkSpellItem(type, value) {
+  if (type === "spell") {
+    if (value !== 0 || value !== "") {
+      return `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/spell/${value}.png`;
+    }
+  }
+
+  if (type === "item") {
+    if (value !== 0) {
+      return `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/${value}.png`;
+    }
+  }
+
+  return "";
+}
+
 // Displaying individual match's statistics
 function displayMatchData(gameIndex, summonerMatchStats, summonerTeamStats) {
   let championName = summonerMatchStats.championId;
-  championName = getChampion(championName);
-  championName = checkNameFormat(championName);
+  let unformattedChampionName = getChampion(championName);
+  championName = checkNameFormat(unformattedChampionName);
   championValues[gameIndex].textContent = championName;
-  championArt[gameIndex].src = `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${championName}_0.jpg`;
+  championArt[gameIndex].src = `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${unformattedChampionName}_0.jpg`;
 
   // display spell images
-  spellValues[(2 * gameIndex)].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/spell/${spellNames[summonerMatchStats.spells[0] - 1]}.png`;
-  spellValues[(2 * gameIndex) + 1].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/spell/${spellNames[summonerMatchStats.spells[1] - 1]}.png`;
+  spellValues[(2 * gameIndex)].src = checkSpellItem("spell", spellNames[summonerMatchStats.spells[0] - 1]);
+  spellValues[(2 * gameIndex) + 1].src = checkSpellItem("spell", spellNames[summonerMatchStats.spells[1] - 1]);
 
   // display item images
-  itemValues[(6 * gameIndex)].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/${summonerMatchStats.items[0]}.png`;
-  itemValues[(6 * gameIndex) + 1].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/${summonerMatchStats.items[1]}.png`;
-  itemValues[(6 * gameIndex) + 2].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/${summonerMatchStats.items[2]}.png`;
-  itemValues[(6 * gameIndex) + 3].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/${summonerMatchStats.items[3]}.png`;
-  itemValues[(6 * gameIndex) + 4].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/${summonerMatchStats.items[4]}.png`;
-  itemValues[(6 * gameIndex) + 5].src = `http://ddragon.leagueoflegends.com/cdn/10.6.1/img/item/${summonerMatchStats.items[5]}.png`;
+  itemValues[(6 * gameIndex)].src = checkSpellItem("item", summonerMatchStats.items[0]);
+  itemValues[(6 * gameIndex) + 1].src = checkSpellItem("item", summonerMatchStats.items[1]);
+  itemValues[(6 * gameIndex) + 2].src = checkSpellItem("item", summonerMatchStats.items[2]);
+  itemValues[(6 * gameIndex) + 3].src = checkSpellItem("item", summonerMatchStats.items[3]);
+  itemValues[(6 * gameIndex) + 4].src = checkSpellItem("item", summonerMatchStats.items[4]);
+  itemValues[(6 * gameIndex) + 5].src = checkSpellItem("item", summonerMatchStats.items[5]);
 
   // display individual stats
   kdaValues[gameIndex].textContent = `${summonerMatchStats.kda}`;
