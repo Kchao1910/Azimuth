@@ -17,11 +17,18 @@ body {
   color: var(--off-white);
 }
 
-.main-grid {
+.main-summoner-grid, .main-grid {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);
+}
+
+.main-grid {
   height: calc(100vh - 48px);
+}
+
+.main-summoner-grid {
+  height: calc(530vh - 48px);
 }
 
 .brand-name {
@@ -67,17 +74,6 @@ body {
   opacity: 0.75;
   z-index: -1;
 }
-
-/*.scroll-message {
-  animation: 2s ease-in-out fade-in-out infinite;
-  align-self: center;
-  color: var(--off-red);
-  font-weight: bold;
-  grid-column: 8;
-  grid-row: 3/7;
-  justify-self: center;
-  writing-mode: vertical-lr;
-}*/
 
 .about-page {
   margin-top: 24px;
@@ -145,6 +141,38 @@ body {
 .summoner-recent-matches-header {
   grid-column: 1/9;
   margin-top: 1rem;
+}
+
+.summoner-win-statistics-header, .summoner-win-statistics-card {
+  grid-column: 1/5;
+  margin-top: 1rem;
+}
+
+.summoner-loss-statistics-header, .summoner-loss-statistics-card {
+  grid-column: 5/9;
+  margin-top: 1rem;
+  margin-left: 1rem;
+}
+
+.summoner-win-statistics-header, .summoner-loss-statistics-header {
+  text-align: center;
+}
+
+.summoner-win-statistics-card, .summoner-loss-statistics-card {
+  background: var(--off-gray);
+  height: 17em;
+  padding: 1rem;
+}
+
+.average-statistics-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1fr;
+  text-align: center;
+}
+
+.summoner-win-statistics-card {
+  margin-right: 1rem;
 }
 
 .summoner-profile-card {
@@ -265,6 +293,12 @@ body {
 .summoner-search-button:hover {
   transition: 0.5s ease-in-out;
   opacity: 1;
+}
+
+.chart {
+  grid-column: 1/5;
+  grid-row: 16;
+  max-width: 650px;
 }
 
 option {

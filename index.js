@@ -1,69 +1,3 @@
-/* 
-When it works
-1) 6 requests involving the key per summoner
-
-Issues to be fixed 
-1) When summoner name is not syntaxically the same (ex. Hide on Bush vs HiDE oN BuSH) the application will run into a problem
-where we get a "paused on exception". This happens when we need to get the data to populate the profile card.
-2) 403 error due to missing item (in other words, not a full set of 6 items)
-
-Issue Observations
-1) Looking at the network we can see that error may be due to rate limits of are api key, 
-
-Observation Steps
-1) Rate limit comes in when we look up another summoner right immediately after the current one
-2) Happens roughly at the 8th request 
-3) Looking at Riot documentation, rate limits are imposed not only on requests that depend on the api key
-
-Pending functionalities
-1) Data analytics
-2) Hiding api key (if we want to host it)
-3) Dynamic generation of all matches (up to 100)
-4) Smoother transition from home page to summoner page
-5) Get production key from Riot
-
-
-*/
-// Part 1: Get input and validate/ ensure that values are filled and correct.
-// Form starting point with region and combine with api
-// Send full api as input to function that outputs response
-// Part 2: Get response, if valid proceed, if not valid do not proceed. (Alert).
-// Part 3: Get information and display
-// Part 4: Data Analytics
-
-/* 
-Elements that need to be populated
-
-Summoner profile card
-1) Summoner Name
-2) Summoner Tier
-3) Summoner Wins/Losses
-4) Summoner League Points
-
-Recent Match Card
-1) Spells - requires 6 individual spells
-2) Items - requires 2 individual items
-3) K/D/A - requires combined string of kills, deaths, and assists
-4) CS (Neutral) - requires both total minions and neutral monsters
-5) Total DMG Dealt - 1 number
-6) Total DMG Taken - 1 number
-7) Total DMG Healed - 1 number
-8) Objective DMG Dealt - 1 number
-9) Objective DMG Taken - 1 number
-10) Barons - 1 number
-11) Dragons - 1 number
-12) Heralds - 1 number
-13) Objectives - 1 number
-14) Win/Loss - 1 string
-
-*/
-
-/* 
-Known api sections
-1) Region
-2) Api ending - different values required
-*/
-
 // Reminder: api keys must be updated daily to ensure application works, api key is appended to the end of each api (may be other additional options).
 const apiKey = "";
 
@@ -101,6 +35,44 @@ const dragonValues = document.querySelectorAll(".dragon-value");
 const heraldValues = document.querySelectorAll(".herald-value");
 const towerValues = document.querySelectorAll(".tower-value");
 const winValues = document.querySelectorAll(".win-status-value");
+
+const killAverage = document.querySelector(".avg-kills-win");
+const deathAverage = document.querySelector(".avg-deaths-win");
+const assistAverage = document.querySelector(".avg-assits-win");
+const minionAverage = document.querySelector(".avg-minions-win");
+const goldAverage = document.querySelector(".avg-gold-win");
+const dmgRatioAverage = document.querySelector(".avg-dmgRatio-win");
+const objDmgAverage = document.querySelector(".avg-objDmg-win");
+const towerAverage = document.querySelector(".avg-towers-win");
+
+const killAverageLoss = document.querySelector(".avg-kills-loss");
+const deathAverageLoss = document.querySelector(".avg-deaths-loss");
+const assistAverageLoss = document.querySelector(".avg-assits-loss");
+const minionAverageLoss = document.querySelector(".avg-minions-loss");
+const goldAverageLoss = document.querySelector(".avg-gold-loss");
+const dmgRatioAverageLoss = document.querySelector(".avg-dmgRatio-loss");
+const objDmgAverageLoss = document.querySelector(".avg-objDmg-loss");
+const towerAverageLoss = document.querySelector(".avg-towers-loss");
+
+let averageKillsWin = 0;
+let averageDeathsWin = 0;
+let averageAssistsWin = 0;
+let averageGoldWin = 0;
+let averageMinionsWin = 0;
+let averageDamageRatioWin = 0;
+let averageObjDamageWin = 0;
+let averageTowersWin = 0;
+let averageWins = 0;
+
+let averageKillsLoss = 0;
+let averageDeathsLoss = 0;
+let averageAssistsLoss = 0;
+let averageGoldLoss = 0;
+let averageMinionsLoss = 0;
+let averageDamageRatioLoss = 0;
+let averageObjDamageLoss = 0;
+let averageTowersLoss = 0;
+let averageLosses = 0;
 
 // 14 champions display incorrectly due to spacing and apostrophes not included in the api
 let alternativeChampionNames = {
@@ -391,7 +363,6 @@ function validateUserInput(summonerName, summonerRegion) {
     //summonerName = summonerName.replace(" ", "%20"); // URLify white space, may not be required
     basicApiData.urlName = summonerName;
     basicApiData.region = summonerRegion;
-    console.log(summonerName);
     
     return true;
   }
@@ -426,6 +397,8 @@ function getLeagueData(id) {
     let wins = data[0]["wins"];
     const leagueStats = new summonerLeagueData(leaguePoints, losses, rank, tier, summonerName, wins);
     displayBasicSummonerData(leagueStats);
+    //displayWinLossChart(wins, losses);
+
   }).catch(error => {
     console.warn(error);
   });
@@ -433,7 +406,7 @@ function getLeagueData(id) {
 
 function getMatchList(accountId) {
   let apiRoute = formApiRoute(basicApiData.region, matchApi);
-  let apiEnding = `${accountId}?beginIndex=0&endIndex=3&api_key=${apiKey}`;
+  let apiEnding = `${accountId}?beginIndex=0&endIndex=10&api_key=${apiKey}`;
   let apiUrl = formApiUrl(apiRoute, apiEnding);
 
   asyncApiFetch(apiUrl)
@@ -470,7 +443,6 @@ function getParticipantStats(gameIndex, timeline, participantId) {
   let championId = participant.championId;
   let teamId = ((participant.teamId / 100) - 1);
   let spells = [participant.spell1Id, participant.spell2Id];
-  console.log(spells);
   let items = [stats.item0, stats.item1, stats.item2, stats.item3, stats.item4, stats.item5]; // does not include trinkets (wards/ traps)
   let kills = stats.kills;
   let deaths = stats.deaths;
@@ -491,6 +463,29 @@ function getParticipantStats(gameIndex, timeline, participantId) {
   let towers = teams.towerKills;
   let win = teams.win;
 
+  // push into average arrays
+  if (win === "Win") {
+    averageKillsWin += kills;
+    averageDeathsWin += deaths;
+    averageAssistsWin += assists;
+    averageMinionsWin += totalMinions;
+    averageGoldWin += gold;
+    averageDamageRatioWin += totalDamageDealt/totalDamageTaken;
+    averageObjDamageWin += objectiveDamageDealt;
+    averageTowersWin += towers;
+    averageWins += 1;
+  } else {
+    averageKillsLoss += kills;
+    averageDeathsLoss += deaths;
+    averageAssistsLoss += assists;
+    averageMinionsLoss += totalMinions;
+    averageGoldLoss += gold;
+    averageDamageRatioLoss += totalDamageDealt/totalDamageTaken;
+    averageObjDamageLoss += objectiveDamageDealt;
+    averageTowersLoss += towers;
+    averageLosses += 1;
+  }
+
   let summonerMatchStats = new summonerIndividualMatchData(championId, spells, items, kills, deaths, assists, gold, totalMinions, neutralMinions,
   totalDamageDealt, totalDamageTaken, totalDamageHealed, totalDamageMitigated, objectiveDamageDealt);
 
@@ -498,7 +493,27 @@ function getParticipantStats(gameIndex, timeline, participantId) {
   
   displayMatchData(gameIndex, summonerMatchStats, summonerTeamStats);
 
- 
+  if ((averageWins + averageLosses) === 10) {
+    displayAverages(averageKillsWin, killAverage, averageWins);
+    displayAverages(averageDeathsWin, deathAverage, averageWins);
+    displayAverages(averageAssistsWin, assistAverage, averageWins);
+    displayAverages(averageGoldWin, goldAverage, averageWins);
+    displayAverages(averageMinionsWin, minionAverage, averageWins);
+    displayAverages(averageDamageRatioWin, dmgRatioAverage, averageWins);
+    displayAverages(averageObjDamageWin, objDmgAverage, averageWins);
+    displayAverages(averageTowersWin, towerAverage, averageWins);
+
+      // Loss averages
+    displayAverages(averageKillsLoss, killAverageLoss, averageLosses);
+    displayAverages(averageDeathsLoss, deathAverageLoss, averageLosses);
+    displayAverages(averageAssistsLoss, assistAverageLoss, averageLosses);
+    displayAverages(averageGoldLoss, goldAverageLoss, averageLosses);
+    displayAverages(averageMinionsLoss, minionAverageLoss, averageLosses);
+    displayAverages(averageDamageRatioLoss, dmgRatioAverageLoss, averageLosses);
+    displayAverages(averageObjDamageLoss, objDmgAverageLoss, averageLosses);
+    displayAverages(averageTowersLoss, towerAverageLoss, averageLosses); 
+  }
+
   return;
 }
 
@@ -577,6 +592,35 @@ function displayMatchData(gameIndex, summonerMatchStats, summonerTeamStats) {
   heraldValues[gameIndex].textContent = summonerTeamStats.heralds;
   towerValues[gameIndex].textContent = summonerTeamStats.objectives;
   winValues[gameIndex].textContent = (summonerTeamStats.winLoss !== "Fail" ? "Win" : "Loss");
+}
+
+function displayAverages(sum, container, games) {
+  let statAverage = calculateAverage(sum, games);
+  
+  container.textContent = statAverage.toFixed(2);
+}
+
+function calculateAverage(sum, games) {
+  return (sum / games);
+}
+
+function displayWinLossChart(wins, losses) {
+  var options = {
+    series: [wins, losses],
+    labels: ["Wins", "Losses"],
+    chart: {
+      height: 500,
+      width: 500,
+      type: 'donut',
+    },
+    colors: ['#00FF46', '#e03134'],
+    legend: {
+      position: 'bottom'
+    }
+  };
+
+    let chart = new ApexCharts(document.querySelector(".chart"), options);
+    chart.render();
 }
 
 function getChampion(championId) {
