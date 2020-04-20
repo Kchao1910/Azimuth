@@ -12,9 +12,12 @@
 }
 
 body {
+  display: flex;
+  align-items: center;
   padding: 24px;
   background: black;
   color: var(--off-white);
+  justify-content: center;
 }
 
 .main-summoner-grid, .main-grid {
@@ -179,7 +182,7 @@ body {
 
 .summoner-profile-card {
   background: var(--off-gray);
-  grid-column: 1/4;
+  grid-column: 1/5;
   grid-row: 3;
   padding: 1rem;
 }
