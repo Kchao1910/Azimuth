@@ -24,11 +24,13 @@ body {
 }
 
 .main-grid {
-  height: calc(100vh - 48px);
+  height: 702.4px;
+  width: 1471.2px;
 }
 
 .main-summoner-grid {
-  height: calc(530vh - 48px);
+  height: 3880px;
+  width: 1471.2px;
 }
 
 .brand-name {
