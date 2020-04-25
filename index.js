@@ -653,6 +653,26 @@ document.addEventListener("click", event => {
           let name = data["name"];
           const basicStats = new summonerBasicData(accountId, id, name);
 
+          averageKillsWin = 0;
+          averageDeathsWin = 0;
+          averageAssistsWin = 0;
+          averageGoldWin = 0;
+          averageMinionsWin = 0;
+          averageDamageRatioWin = 0;
+          averageObjDamageWin = 0;
+          averageTowersWin = 0;
+          averageWins = 0;
+
+          averageKillsLoss = 0;
+          averageDeathsLoss = 0;
+          averageAssistsLoss = 0;
+          averageGoldLoss = 0;
+          averageMinionsLoss = 0;
+          averageDamageRatioLoss = 0;
+          averageObjDamageLoss = 0;
+          averageTowersLoss = 0;
+          averageLosses = 0;
+
           getLeagueData(basicStats.id);
           getMatchList(basicStats.accountId);
 
