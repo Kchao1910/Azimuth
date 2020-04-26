@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="https://use.typekit.net/rqh6lpp.css">
   <link rel="stylesheet" href="index.css">
   <title>Document</title>
+  <script type = "text/javascript" src = "https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 </head>
 <body>
   <main class="main-summoner-grid">
@@ -35,18 +36,23 @@
     <div class="summoner-profile-card">
       <h3 class="summoner-name">N/A</h3>
       <div class="summoner-attribute-pair">
-        <section class="attribute-headers">
+        <div class="attribute-headers">
           <h3 class="attribute-header">TIER</h3>
           <h3 class="attribute-header">WINS/LOSSES</h3>
           <h3 class="attribute-header">LEAGUE POINTS</h3>
-        </section>
-        <section class="attribute-values">
+        </div>
+        <div class="attribute-values">
           <h3 class="attribute-value tier-value">N/A</h3>
           <h3 class="attribute-value win-loss-value">N/A</h3>
           <h3 class="attribute-value league-points-value">N/A</h3>
-        </section>
+        </div>
+          <div>
+              <canvas id = "winLossChart" width = "200" height = "120"></canvas>
+          </div>  
+        </div>
+        
       </div>
-    </div>
+        
 
     <div class="summoner-recent-match-card">
       <h3 class="champion-name">N/A</h3>
@@ -769,6 +775,15 @@
         </div>
       </section>
     </div>
+    <h2 class="summoner-recent-matches-header header">KDA TREND</h2>
+    <div class = "summoner-recent-match-card">
+        <canvas id = "kdachart" width = "400" height = "200"></canvas>
+          
+    </div>
+    
+    
+   
+
     
     <!--- <div class="chart"></div> -->
   </main>

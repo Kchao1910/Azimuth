@@ -12,8 +12,8 @@
 }
 
 body {
-  align-items: center;
   display: flex;
+  align-items: center;
   padding: 24px;
   background: black;
   color: var(--off-white);
@@ -181,6 +181,7 @@ body {
 }
 
 .summoner-profile-card {
+  width:52em;
   background: var(--off-gray);
   grid-column: 1/5;
   grid-row: 3;
@@ -195,6 +196,7 @@ body {
 }
 
 .summoner-attribute-pair {
+  width: 50em;
   display: flex;
 }
 

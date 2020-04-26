@@ -1,5 +1,5 @@
 // Reminder: api keys must be updated daily to ensure application works, api key is appended to the end of each api (may be other additional options).
-const apiKey = "";
+const apiKey = "RGAPI-ce5f5920-210c-41cd-95ca-3cc21a00599d";
 
 // 4 Main apis required to display all information required
 // Summoner - gets summoner information such as name and id. Id is required input for League Api and Match Timeline Api.
@@ -54,6 +54,16 @@ const dmgRatioAverageLoss = document.querySelector(".avg-dmgRatio-loss");
 const objDmgAverageLoss = document.querySelector(".avg-objDmg-loss");
 const towerAverageLoss = document.querySelector(".avg-towers-loss");
 
+const kChart = [];
+const dChart = [];
+const aChart = [];
+const kdaRatioChart = [];
+const DPDChart = [];
+const DPGChart = [];
+let winsChart = 0;
+let lossesChart = 0;
+
+
 let averageKillsWin = 0;
 let averageDeathsWin = 0;
 let averageAssistsWin = 0;
@@ -73,6 +83,7 @@ let averageDamageRatioLoss = 0;
 let averageObjDamageLoss = 0;
 let averageTowersLoss = 0;
 let averageLosses = 0;
+
 
 // 14 champions display incorrectly due to spacing and apostrophes not included in the api
 let alternativeChampionNames = {
@@ -397,6 +408,7 @@ function getLeagueData(id) {
     let wins = data[0]["wins"];
     const leagueStats = new summonerLeagueData(leaguePoints, losses, rank, tier, summonerName, wins);
     displayBasicSummonerData(leagueStats);
+    winLossChartIt(losses, wins);
     //displayWinLossChart(wins, losses);
 
   }).catch(error => {
@@ -445,13 +457,22 @@ function getParticipantStats(gameIndex, timeline, participantId) {
   let spells = [participant.spell1Id, participant.spell2Id];
   let items = [stats.item0, stats.item1, stats.item2, stats.item3, stats.item4, stats.item5]; // does not include trinkets (wards/ traps)
   let kills = stats.kills;
+  kChart.push(kills);
   let deaths = stats.deaths;
-  let assists = stats.assists;
+  dChart.push(deaths);
+  let assists = stats.assists; 
+  aChart.push(assists);
+  let kdaRatio = (kills + assists) * 1.0 / deaths;
+  kdaRatioChart.push(kdaRatio);
   let totalMinions = stats.totalMinionsKilled;
   let neutralMinions = stats.neutralMinionsKilled;
   let gold = stats.goldEarned;
   let totalDamageDealt = stats.totalDamageDealt;
   let totalDamageTaken = stats.totalDamageTaken;
+  let DPD = totalDamageTaken / 1000 / deaths;
+  DPDChart.push(DPD);
+  let DPG = totalDamageTaken / gold;
+  DPGChart.push(DPG);
   let totalDamageHealed = stats.totalHeal;
   let totalDamageMitigated = stats.damageSelfMitigated;
   let objectiveDamageDealt = stats.damageDealtToObjectives;
@@ -491,7 +512,8 @@ function getParticipantStats(gameIndex, timeline, participantId) {
 
   let summonerTeamStats = new summonerTeamData(teamId, barons, dragons, heralds, towers, win);
   
-  displayMatchData(gameIndex, summonerMatchStats, summonerTeamStats);
+  displayMatchData(gameIndex, summonerMatchStats, summonerTeamStats); 
+  chartIt();
 
   if ((averageWins + averageLosses) === 10) {
     displayAverages(averageKillsWin, killAverage, averageWins);
@@ -578,6 +600,7 @@ function displayMatchData(gameIndex, summonerMatchStats, summonerTeamStats) {
 
   // display individual stats
   kdaValues[gameIndex].textContent = `${summonerMatchStats.kda}`;
+  console.log(summonerMatchStats.kda)
   csValues[gameIndex].textContent = `${summonerMatchStats.totalMinions} (${summonerMatchStats.neutralMinions})`;
   goldValues[gameIndex].textContent = summonerMatchStats.gold;
   totalDamageDealtValues[gameIndex].textContent = summonerMatchStats.totalDamageDealt;
@@ -632,6 +655,149 @@ function getChampion(championId) {
 
   return;
 }
+function winLossChartIt(losses, wins) {
+    
+    console.log(losses);
+    console.log(wins);
+    var ctx = document.getElementById('winLossChart').getContext('2d');
+    var myPieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+         labels: ['WINS','LOSSES'],
+        datasets:[{
+            data : [wins, losses],
+            backgroundColor : ['rgba(230, 41, 49, 0.6)','rgba(54, 162, 235, 0.6)'],
+            borderWidth:0
+        }],
+    }
+});
+   
+}
+function chartIt() {
+   var ctx = document.getElementById('kdachart').getContext('2d');
+   var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['1', '2', '3', '4', '5', '6','7', '8', '9', '10'],
+        datasets: [{
+            label: 'KILLS',
+            data: kChart,
+            fill:false,
+            borderColor:   'rgba(100, 180, 235, 1)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(100, 180, 235, 1)',
+            pointRadius:3,
+            hidden:true
+            
+        },
+            {
+            label: 'DEATHS',
+            data: dChart,
+            fill:false,
+            borderColor: 'rgba(54, 150, 235, 1)',
+            borderWidth: 2,
+            borderJoinStyle: 'miter',
+            pointBackgroundColor:'rgba(54, 162, 235, 1)',
+            pointRadius:3,
+            hidden:true
+        },
+            {
+            label: 'ASSISTS',
+            data: aChart,
+            fill:false,
+            borderColor:'rgba(10, 80, 150, 1)',
+            borderWidth: 2,
+            borderJoinStyle: 'miter',
+            pointBackgroundColor:'rgba(10, 80, 150, 1)',
+            pointRadius:3,
+            hidden:true
+        },
+        {
+            label: 'KDA RATIO',
+            data: kdaRatioChart,
+            fill:false,
+            borderColor:'rgba(230, 41, 49, 1)',
+            borderWidth: 6,
+            borderJoinStyle: 'miter',
+            pointBackgroundColor:'rgba(230, 41, 49, 1)',
+            pointRadius:6,
+        },
+        {
+            label: 'DPD',
+            data: DPDChart,
+            fill:false,
+            borderColor:'rgba(122, 41, 49, 1)',
+            borderWidth: 6,
+            borderJoinStyle: 'miter',
+            pointBackgroundColor:'rgba(230, 41, 49, 1)',
+            pointRadius:6,
+            hidden:true
+        },
+            {
+            label: 'DPG',
+            data: DPGChart,
+            fill:false,
+            borderColor:'rgba(90, 229, 49, 1)',
+            borderWidth: 6,
+            borderJoinStyle: 'miter',
+            pointBackgroundColor:'rgba(230, 41, 49, 1)',
+            pointRadius:6,
+            hidden:true
+        }]
+        
+    },
+        options: {
+        legend: {
+            labels: {
+                // This more specific font property overrides the global property
+                fontColor: 'white',
+                fontSize: 20
+                
+            }
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    fontSize:20
+                    
+                },
+                scaleLabel: {
+                    display:true,
+                    labelString:"STATICS",
+                    fontSize:20,
+                    fontColor:'white',
+                    
+                },
+                
+               gridLines: {
+                   display:true,
+                   color: 'rgba(241, 241, 241, 0.2)'
+               }
+                
+            }],
+            xAxes: [{
+                ticks: {
+                    fontSize:20
+                    
+                },
+                scaleLabel: {
+                    display:true,
+                    labelString:"RECENT MATCHES",
+                    fontSize:20,
+                    fontColor:'white'
+                    
+                },
+                
+               gridLines: {
+                   display:true,
+                   color: 'rgba(241, 241, 241, 0.2)',
+               }
+            }]
+        }
+    }
+});
+    
+}
 
 // Event delegation
 document.addEventListener("click", event => {
@@ -675,7 +841,11 @@ document.addEventListener("click", event => {
 
           getLeagueData(basicStats.id);
           getMatchList(basicStats.accountId);
-
+          console.log(kChart)
+          console.log(aChart);
+          console.log(dChart);
+          
+          
         }).catch(error => {
           console.warn(error);
         });
