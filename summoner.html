@@ -45,6 +45,9 @@
           <h3 class="attribute-value win-loss-value">N/A</h3>
           <h3 class="attribute-value league-points-value">N/A</h3>
         </section>
+        <div>
+          <canvas id = "winLossChart" width = "200" height = "120"></canvas>
+        </div>  
       </div>
     </div>
 
@@ -769,11 +772,19 @@
         </div>
       </section>
     </div>
-    
-    <!--- <div class="chart"></div> -->
+
+    <h2 class="summoner-recent-matches-header header">IN GAME STATISTIC TREND</h2>
+    <div class = "summoner-recent-match-card">
+        <canvas id = "kdachart" width = "400" height = "200"></canvas>
+    </div>
+
+    <footer>
+      <p>Azimuth isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</p>
+    </footer>
   </main>
 
   <!-- <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script> -->
+  <script type = "text/javascript" src = "https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
   <script src="index.js"></script>
 </body>
 </html>

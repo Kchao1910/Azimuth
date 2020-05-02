@@ -14,10 +14,19 @@
 body {
   display: flex;
   align-items: center;
+  flex-direction: column;
   padding: 24px;
   background: black;
   color: var(--off-white);
   justify-content: center;
+}
+
+footer {
+  color: gray;
+  grid-column: 1/8;
+  font-size: 0.75rem;
+  margin-top: 0rem;
+  transform: translateY(2rem);
 }
 
 .main-summoner-grid, .main-grid {
@@ -319,16 +328,6 @@ option {
     opacity: 1;
   }
 }
-
-/* For scroll feature if needed
-@keyframes fade-in-out {
-  0% {
-    opacity: 0.1;
-  } 100% {
-    opacity: 0.8;
-  }
-}
-*/
 
 @keyframes fade-in {
   0% {
