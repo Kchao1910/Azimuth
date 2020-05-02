@@ -1,5 +1,5 @@
 // Reminder: api keys must be updated daily to ensure application works, api key is appended to the end of each api (may be other additional options).
-const apiKey = "";
+let apiKey = "";
 
 // 4 Main apis required to display all information required
 // Summoner - gets summoner information such as name and id. Id is required input for League Api and Match Timeline Api.
