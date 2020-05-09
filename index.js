@@ -1,5 +1,5 @@
 // Reminder: api keys must be updated daily to ensure application works, api key is appended to the end of each api (may be other additional options).
-let apiKey = "";
+let apiKey = "RGAPI-ef8ca48f-ed17-4655-b2c9-dcc7d7604471";
 
 // 4 Main apis required to display all information required
 // Summoner - gets summoner information such as name and id. Id is required input for League Api and Match Timeline Api.
@@ -746,7 +746,7 @@ function chartIt() {
               },
               scaleLabel: {
                   display:true,
-                  labelString:"STATICS",
+                  labelString:"STATISTICS",
                   fontSize:20,
                   fontColor:'white',
                   
